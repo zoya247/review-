@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rate Your Stay</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #1E1D1B;
+    color: #F5F1E8;
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .card {
+    background: #2a2927;
+    border: 1px solid #3a3835;
+    border-radius: 16px;
+    padding: 48px 40px;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+  }
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-weight: 600;
+    color: #C2A56B;
+    margin-bottom: 8px;
+  }
+  p {
+    color: #b0a898;
+    font-size: 0.95rem;
+    margin-bottom: 36px;
+    line-height: 1.6;
+  }
+  .stars {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 36px;
+  }
+  .star {
+    font-size: 2.4rem;
+    cursor: pointer;
+    color: #3a3835;
+    transition: color 0.15s, transform 0.15s;
+    user-select: none;
+  }
+  .star:hover, .star.active { color: #C2A56B; transform: scale(1.15); }
+  .screen { display: none; }
+  .screen.active { display: block; }
+  .celebrate { font-size: 3rem; margin-bottom: 16px; }
+  .btn {
+    display: inline-block;
+    background: #C2A56B;
+    color: #1E1D1B;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 1rem;
+    padding: 14px 32px;
+    border-radius: 8px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: opacity 0.2s;
+  }
+  .btn:hover { opacity: 0.85; }
+  .form-group { margin-bottom: 16px; text-align: left; }
+  label { display: block; font-size: 0.85rem; color: #b0a898; margin-bottom: 6px; }
+  input, textarea {
+    width: 100%;
+    background: #1E1D1B;
+    border: 1px solid #3a3835;
+    border-radius: 8px;
+    color: #F5F1E8;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    padding: 12px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus, textarea:focus { border-color: #C2A56B; }
+  textarea { resize: vertical; min-height: 100px; }
+  .back-btn {
+    background: none;
+    border: none;
+    color: #b0a898;
+    font-size: 0.85rem;
+    cursor: pointer;
+    margin-top: 16px;
+    text-decoration: underline;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .back-btn:hover { color: #F5F1E8; }
+</style>
+</head>
+<body>
+<div class="card">
+
+  <div class="screen active" id="screen-rating">
+    <h1>How was your stay?</h1>
+    <p>Your feedback means a lot. Tap a star to get started.</p>
+    <div class="stars" id="stars">
+      <span class="star" data-value="1">★</span>
+      <span class="star" data-value="2">★</span>
+      <span class="star" data-value="3">★</span>
+      <span class="star" data-value="4">★</span>
+      <span class="star" data-value="5">★</span>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-five">
+    <div class="celebrate">🌟</div>
+    <h1>So glad you loved it!</h1>
+    <p>Would you mind sharing a quick review on Airbnb? It only takes 30 seconds and makes a huge difference.</p>
+    <a class="btn" href="https://www.airbnb.co.uk/rooms/1479068695251388980" target="_blank" rel="noopener">Leave a Review on Airbnb →</a>
+    <br />
+    <button class="back-btn" onclick="reset()">← Go back</button>
+  </div>
+
+  <div class="screen" id="screen-feedback">
+    <h1>Thank you for being honest</h1>
+    <p>We'd love to hear what we can do better. This stays completely private.</p>
+    <form id="feedback-form">
+      <div class="form-group">
+        <label>Your name</label>
+        <input type="text" name="name" placeholder="e.g. Sarah" required />
+      </div>
+      <div class="form-group">
+        <label>Your email</label>
+        <input type="email" name="email" placeholder="e.g. sarah@email.com" required />
+      </div>
+      <div class="form-group">
+        <label>What could we improve?</label>
+        <textarea name="message" placeholder="Tell us anything — we read every message." required></textarea>
+      </div>
+      <button type="submit" class="btn" style="width:100%;">Send Feedback →</button>
+    </form>
+    <button class="back-btn" onclick="reset()">← Go back</button>
+  </div>
+
+  <div class="screen" id="screen-thanks">
+    <div class="celebrate">🙏</div>
+    <h1>Thank you</h1>
+    <p>We really appreciate you taking the time. We'll use your feedback to make things even better for future guests.</p>
+  </div>
+
+</div>
+
+<script>
+  const stars = document.querySelectorAll('.star');
+  let selected = 0;
+
+  stars.forEach(star => {
+    star.addEventListener('mouseover', () => highlight(+star.dataset.value));
+    star.addEventListener('mouseout', () => highlight(selected));
+    star.addEventListener('click', () => {
+      selected = +star.dataset.value;
+      highlight(selected);
+      setTimeout(() => {
+        if (selected === 5) show('screen-five');
+        else show('screen-feedback');
+      }, 300);
+    });
+  });
+
+  function highlight(val) {
+    stars.forEach(s => s.classList.toggle('active', +s.dataset.value <= val));
+  }
+
+  function show(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function reset() {
+    selected = 0;
+    highlight(0);
+    show('screen-rating');
+  }
+
+  document.getElementById('feedback-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    show('screen-thanks');
+  });
+</script>
+</body>
+</html>
